@@ -5,7 +5,7 @@ import type { VendorItem } from '@/interfaces/VendorItem'
 import PocketBase from 'pocketbase'
 
 // POCKETBASE URL
-const URL = import.meta.env.POCKETBASE_URL
+const URL = import.meta.env.VITE_POCKETBASE_URL
 
 // INITIALIZE THE POCKETBASE INSTANCE
 const pb = new PocketBase(URL)
