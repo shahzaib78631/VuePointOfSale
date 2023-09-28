@@ -50,3 +50,4 @@ npm run lint
 # VuePointOfSale
 # VuePointOfSale
 # VuePointOfSale
+# VuePointOfSale
