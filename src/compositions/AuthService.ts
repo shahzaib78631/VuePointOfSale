@@ -1,4 +1,4 @@
-import { pb } from '@/configs/Pocketbase'
+import { supabase } from '@/configs/Supabase'
 import { reactive, ref } from 'vue'
 
 interface User {
@@ -15,33 +15,46 @@ export function useAuth() {
   const loading = ref(false)
 
   /**
-   * Function for handling pocketbase session
+   * Function for handling supabase session
    */
-  const retreivePocketbaseSession = async () => {
-    if (pb.authStore.isValid) {
-      User.loggedIn = true
-      User.name = pb.authStore.model?.name
-    } else {
-      User.loggedIn = false
-      User.name = ''
+  const retreiveSupabaseSession = async () => {
+    const { data, error } = await supabase.auth.getSession()
+
+    console.log(data, error)
+
+    if (!error) {
+      if (data?.session !== null) {
+        User.loggedIn = true
+        User.name = data.session?.user.email || null
+      } else {
+        User.loggedIn = false
+        User.name = ''
+      }
     }
   }
 
   const retreiveSession = async () => {
-    retreivePocketbaseSession()
+    retreiveSupabaseSession()
   }
 
   /**
-   * Function for handling pocketbase login
+   * Function for handling supabase login
    * @param email
    * @param password
    */
-  const handlePocketbaseLogin = async (email: string, password: string) => {
+  const handleSupabaseLogin = async (email: string, password: string) => {
     try {
       loading.value = true
-      const authData = await pb.collection('users').authWithPassword(email, password)
-      User.name = pb.authStore.model?.name
-      User.loggedIn = true
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      })
+
+      if (error) throw error
+      else {
+        User.name = email.split('@')[0].replace('_', ' ')
+        User.loggedIn = true
+      }
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message)
@@ -52,21 +65,21 @@ export function useAuth() {
   }
 
   const handleLogin = async (email: string, password: string) => {
-    handlePocketbaseLogin(email, password)
+    handleSupabaseLogin(email, password)
   }
 
   /**
-   * Function for logging out from pocketbase
+   * Function for logging out from supabase
    */
-  const logoutPocketbaseUser = () => {
-    pb.authStore.clear()
+  const logoutSupabaseUser = () => {
+    supabase.auth.signOut()
 
     User.name = ''
     User.loggedIn = false
   }
 
   const logoutUser = () => {
-    logoutPocketbaseUser()
+    logoutSupabaseUser()
   }
 
   return {

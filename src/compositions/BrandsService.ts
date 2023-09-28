@@ -1,7 +1,7 @@
 import { reactive, ref, watch } from 'vue'
 import type { BrandItem } from '@/interfaces/BrandItem'
+import { supabase } from '@/configs/Supabase'
 import type { BrandListItem } from '@/interfaces/BrandListItem'
-import { api } from '@/configs/Pocketbase'
 
 const BrandsList = reactive<Record<BrandListItem['id'], BrandItem>>({})
 const Brands = ref<Array<BrandItem>>([])
@@ -17,32 +17,51 @@ export function useBrands() {
    * Function for subscribing to products table
    */
   const subscribeToBrandsTable = () => {
-    api.Brands.subscribe((payload) => {
-      const databaseBrand: BrandItem = payload.record as BrandItem
+    console.log('SUBSC')
 
-      // CREATE A BRAND ITEM
-      const brand: BrandItem = {
-        id: databaseBrand?.id,
-        name: databaseBrand?.name
-      }
+    const channel = supabase
+      .channel('brands-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Brands'
+        },
+        (payload) => {
+          const databaseBrand: BrandItem = payload.new as BrandItem
 
-      // IF EVENT TYPE IS DELETE
-      if (payload.action === 'delete') {
-        // THEN CHECK IF PRODUCT IS IN PRODUCTS LIST
+          // CREATE A BRAND ITEM
+          const brand: BrandItem = {
+            id: databaseBrand?.id,
+            name: databaseBrand?.name
+          }
 
-        if (brand?.id) {
-          if (BrandsList?.[brand.id]) {
-            // IF YES THEN DELETE THE PRODUCT
-            delete BrandsList[brand.id]
+          // IF EVENT TYPE IS DELETE
+          if (payload.eventType === 'DELETE') {
+            // THEN CHECK IF PRODUCT IS IN PRODUCTS LIST
+
+            if (brand?.id) {
+              if (BrandsList?.[brand.id]) {
+                // IF YES THEN DELETE THE PRODUCT
+                delete BrandsList[brand.id]
+              }
+            }
+          }
+          // IF BRAND IS EDITED OR INSERTED
+          else if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            // UPDATE THE BRAND IN THE BRANDS LIST
+            updateBrandInList(brand)
+
+            // // SET THE GIT OPTIONS
+            // gitrows.options(options)
+
+            // // ADD THE PRODUCT IN THE GIT ROWS
+            // gitrows.put(ProductsPath, [payload.new])
           }
         }
-      }
-      // IF BRAND IS EDITED OR INSERTED
-      else if (payload.action === 'create' || payload.action === 'update') {
-        // UPDATE THE BRAND IN THE BRANDS LIST
-        updateBrandInList(brand)
-      }
-    })
+      )
+      .subscribe()
   }
 
   /**
@@ -66,24 +85,30 @@ export function useBrands() {
       name: brand.name
     }
 
-    // INSERT THE BRAND IN THE BRAND TABLE IN POCKETBASE
-    api.Brands.upsert(tempBrand).then((response) => {
-      console.log(response)
-    })
+    // INSERT THE BRAND IN THE BRAND TABLE IN SUPABASE
+    supabase
+      .from('Brands')
+      .upsert(tempBrand)
+      .then((response) => {
+        console.log(response)
+      })
   }
 
   /**
-   * Function to get the brands from pocketbase
+   * Function to get the brands from supabase
    */
   const getBrands = () => {
-    // GET THE BRANDS IN THE BRANDS TABLE IN POCKETBASE
-    api.Brands.get().then((items: any) => {
-      if (items?.length > 0) {
-        items.forEach((brand: BrandItem) => {
-          updateBrandInList(brand)
-        })
-      }
-    })
+    // GET THE BRANDS IN THE BRANDS TABLE IN SUPABASE
+    supabase
+      .from('Brands')
+      .select('*')
+      .then((response) => {
+        if (response?.data) {
+          response.data.forEach((brand: BrandItem) => {
+            updateBrandInList(brand)
+          })
+        }
+      })
   }
 
   return {
