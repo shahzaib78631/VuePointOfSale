@@ -129,6 +129,7 @@
 <script setup lang="ts">
 import { useBrands } from '@/compositions/BrandsService'
 import { useVendors } from '@/compositions/VendorService'
+import type { PartialBy } from '@/interfaces/Partial'
 import type { ProductItem } from '@/interfaces/ProductItem'
 import { ref, reactive, watchEffect } from 'vue'
 
@@ -137,7 +138,7 @@ const { Vendors } = useVendors()
 
 // FORM PROPS
 interface Props {
-  product: ProductItem
+  product?: PartialBy<ProductItem, 'id'>
   isEdit?: boolean
 }
 

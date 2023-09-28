@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
 import { useVendors } from '@/compositions/VendorService'
+import type { PartialBy } from '@/interfaces/Partial'
 import type { VendorItem } from '@/interfaces/VendorItem'
 import { ref, reactive } from 'vue'
 
@@ -45,7 +46,7 @@ const { Vendors } = useVendors()
 
 // FORM PROPS
 interface Props {
-  vendor: VendorItem
+  vendor: PartialBy<VendorItem, 'id'>
   isEdit?: boolean
 }
 

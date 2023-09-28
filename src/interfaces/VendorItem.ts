@@ -1,4 +1,4 @@
 export interface VendorItem {
-  id?: any
+  id: any
   name: string
 }

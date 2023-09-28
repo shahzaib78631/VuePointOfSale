@@ -23,11 +23,12 @@ import { reactive } from 'vue'
 import { useVendors } from '@/compositions/VendorService'
 import type { VendorItem } from '@/interfaces/VendorItem'
 import VendorForm from '@/partials/VendorForm.vue'
+import type { PartialBy } from '@/interfaces/Partial'
 
 const { addVendor } = useVendors()
 
 interface Props {
-  vendor?: VendorItem
+  vendor?: PartialBy<VendorItem, 'id'>
 }
 
 const props = withDefaults(defineProps<Props>(), {

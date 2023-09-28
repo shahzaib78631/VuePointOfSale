@@ -4,7 +4,7 @@ import { reactive } from 'vue'
 import type { CartDetails } from '@/interfaces/CartDetails'
 import type { CartTotals } from '@/interfaces/CartTotals'
 import { useProducts } from './ProductsService'
-import type { ProductsListItem } from '@/interfaces/ProductsListItem'
+import type { ProductItem } from '@/interfaces/ProductItem'
 import { useInvoices } from './InvoiceService'
 
 const CartItems = reactive<Record<CartItem['id'], CartItem>>({})
@@ -61,7 +61,7 @@ export function useCart() {
 
   const handleCheckout = (details: CartDetails, totals: CartTotals) => {
     // CREATE A PRODUCT ITEM
-    const productsToUpdate: Array<ProductsListItem> = []
+    const productsToUpdate: Array<ProductItem> = []
 
     const items = Object.values(CartItems)
     items.forEach((product) => {

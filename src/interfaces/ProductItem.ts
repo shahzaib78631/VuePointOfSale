@@ -1,5 +1,5 @@
 export interface ProductItem {
-  id?: any
+  id: any
   name: string // NAME OF PRODUCT
   unitsPerBox: number // NUMBER OF ITEMS IN A BOX
   unitPrice?: number | string // PRICE OF A SINGLE ITEM AT WHICH ITEM WILL BE SOLD

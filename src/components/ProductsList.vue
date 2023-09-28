@@ -139,14 +139,11 @@ import { nextTick, watch, reactive, ref } from 'vue'
 import { useCart } from '@/compositions/CartService'
 import { useProducts } from '@/compositions/ProductsService'
 import { CartActions } from '@/interfaces/CartActions'
-import { type ProductsListItem } from '@/interfaces/ProductsListItem'
+import { type ProductItem } from '@/interfaces/ProductItem'
 import { type DataTableHeader } from '@/interfaces/DataTableHeader'
 import { useBrands } from '@/compositions/BrandsService'
 import ProductEditForm from '@/partials/ProductEditForm.vue'
 import { useVendors } from '@/compositions/VendorService'
-import type { BrandItem } from '@/interfaces/BrandItem'
-import type { BrandListItem } from '@/interfaces/BrandListItem'
-import type { VendorListItem } from '@/interfaces/VendorListItem'
 
 const { updateCart } = useCart()
 const productsService = useProducts()
@@ -184,7 +181,7 @@ const headers = reactive<Array<DataTableHeader>>([
   { title: 'Actions', key: 'actions', width: '15%', align: 'center', sortable: false }
 ])
 
-let editedItem = reactive<ProductsListItem>({
+let editedItem = reactive<ProductItem>({
   id: 0,
   name: '',
   unitsPerBox: 0,
@@ -193,7 +190,7 @@ let editedItem = reactive<ProductsListItem>({
   price: 0
 })
 
-const defaultItem = reactive<ProductsListItem>({
+const defaultItem = reactive<ProductItem>({
   id: 0,
   name: '',
   unitsPerBox: 0,
@@ -206,12 +203,12 @@ const listActions = [
   {
     id: 0,
     label: 'Edit',
-    action: (item: ProductsListItem) => editItem(item)
+    action: (item: ProductItem) => editItem(item)
   },
   {
     id: 0,
     label: 'Delete',
-    action: (item: ProductsListItem) => deleteItem(item)
+    action: (item: ProductItem) => deleteItem(item)
   }
 ]
 
@@ -234,14 +231,14 @@ watch(
   (val) => val || closeDelete()
 )
 
-function editItem(item: ProductsListItem) {
+function editItem(item: ProductItem) {
   const index = productsService.Products.value.indexOf(item)
   editedIndex.value = index
   editedItem = Object.assign({}, item)
   dialog.value = true
 }
 
-function deleteItem(item: ProductsListItem) {
+function deleteItem(item: ProductItem) {
   editedIndex.value = productsService.Products.value.indexOf(item)
   editedItem = Object.assign({}, item)
   dialogDelete.value = true
@@ -269,7 +266,7 @@ function closeDelete() {
   })
 }
 
-function save(item: ProductsListItem) {
+function save(item: ProductItem) {
   if (editedIndex.value > -1) {
     // Object.assign(Products.value[editedIndex.value], item)
     productsService.updateProduct(item)
@@ -277,7 +274,7 @@ function save(item: ProductsListItem) {
   close()
 }
 
-function addToCart(item: ProductsListItem, action: CartActions) {
+function addToCart(item: ProductItem, action: CartActions) {
   updateCart(
     {
       id: item.id || 0,
@@ -292,11 +289,11 @@ function addToCart(item: ProductsListItem, action: CartActions) {
   )
 }
 
-function totalUnits(item: ProductsListItem) {
+function totalUnits(item: ProductItem) {
   return Math.max(item.quantity * item.unitsPerBox)
 }
 
-function unitPrice(item: ProductsListItem) {
+function unitPrice(item: ProductItem) {
   if (item?.unitPrice) {
     return parseFloat(`${item.unitPrice}`).toFixed(2)
   } else {
@@ -312,7 +309,7 @@ function filterByBrand() {
     return (productsService.Products.value = Object.values(productsService.ProductsList))
 
   productsService.Products.value = Object.values(productsService.ProductsList).filter(
-    (product: ProductsListItem) => product.brand_id == selectedBrand.value.id
+    (product: ProductItem) => product.brand_id == selectedBrand.value.id
   )
 }
 
@@ -324,7 +321,7 @@ function filterByVendors() {
     return (productsService.Products.value = Object.values(productsService.ProductsList))
 
   productsService.Products.value = Object.values(productsService.ProductsList).filter(
-    (product: ProductsListItem) => product.vendor_id == selectedVendor.value.id
+    (product: ProductItem) => product.vendor_id == selectedVendor.value.id
   )
 }
 </script>

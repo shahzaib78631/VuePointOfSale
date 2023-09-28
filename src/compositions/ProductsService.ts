@@ -1,11 +1,9 @@
-import type { CartItem } from '@/interfaces/CartItem'
-import { CartActions } from '@/interfaces/CartActions'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import type { ProductsListItem } from '@/interfaces/ProductsListItem'
+import { reactive, ref, watch } from 'vue'
+import type { ProductItem } from '@/interfaces/ProductItem'
 import { api } from '@/configs/Pocketbase'
 
-export const ProductsList = reactive<Record<ProductsListItem['id'], ProductsListItem>>({})
-const Products = ref<Array<ProductsListItem>>([])
+export const ProductsList = reactive<Record<ProductItem['id'], ProductItem>>({})
+const Products = ref<Array<ProductItem>>([])
 
 watch(
   () => ProductsList,
@@ -19,10 +17,10 @@ export function useProducts() {
    */
   const subscribeToProductsTable = () => {
     api.Products.subscribe((payload) => {
-      const databaseProduct: ProductsListItem = payload.record as ProductsListItem
+      const databaseProduct: ProductItem = payload.record as ProductItem
 
       // CREATE A PRODUCT ITEM
-      const product: ProductsListItem = {
+      const product: ProductItem = {
         id: databaseProduct?.id,
         name: databaseProduct?.name,
         price: databaseProduct?.price,
@@ -57,7 +55,7 @@ export function useProducts() {
     // GET THE PRODUCT IN THE PRODUCTS TABLE IN POCKETBASE
     api.Products.get().then((items: any) => {
       if (items?.length > 0) {
-        items.forEach((product: ProductsListItem) => {
+        items.forEach((product: ProductItem) => {
           ProductsList[product.id] = product
         })
       }
@@ -68,7 +66,7 @@ export function useProducts() {
    * Function for updating Product in the Product List
    * @param product
    */
-  const updateProductInList = (product: ProductsListItem) => {
+  const updateProductInList = (product: ProductItem) => {
     // ADD THE PRODUCT IN THE PRODUCTS LIST
 
     if (product?.id) {
@@ -80,7 +78,7 @@ export function useProducts() {
    * FUNCTION TO UPDATE THE PRODUCT IN POCKETBASE AND PRODUCT LIST
    * @param product
    */
-  const updateProduct = (product: ProductsListItem) => {
+  const updateProduct = (product: ProductItem) => {
     // ADD THE PRODUCT IN THE PRODUCTS LIST
     updateProductInList(product)
 
@@ -92,10 +90,10 @@ export function useProducts() {
    * FUNCTION TO UPDATE THE PRODUCT
    * @param product
    */
-  const updateMultipleProducts = (products: Array<ProductsListItem>) => {
+  const updateMultipleProducts = (products: Array<ProductItem>) => {
     // INSERT THE PRODUCT IN THE PRODUCTS TABLE IN POCKETBASE
 
-    products.map((product: ProductsListItem) =>
+    products.map((product: ProductItem) =>
       api.Products.upsert(product).then((response: any) => {
         console.log(response)
       })
@@ -106,7 +104,7 @@ export function useProducts() {
    * Function for deleting a product from the list of products
    * @param product
    */
-  const deleteProduct = (product: ProductsListItem) => {
+  const deleteProduct = (product: ProductItem) => {
     // DELETE THE PRODUCT FROM THE PRODUCTS LIST
     delete ProductsList[product.id]
 

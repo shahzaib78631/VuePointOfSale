@@ -1,9 +1,9 @@
 import { reactive, ref, watch } from 'vue'
 import type { VendorItem } from '@/interfaces/VendorItem'
-import type { VendorListItem } from '@/interfaces/VendorListItem'
+import type { VendorItem } from '@/interfaces/VendorItem'
 import { api } from '@/configs/Pocketbase'
 
-const VendorsList = reactive<Record<VendorListItem['id'], VendorItem>>({})
+const VendorsList = reactive<Record<VendorItem['id'], VendorItem>>({})
 const Vendors = ref<Array<VendorItem>>([])
 
 watch(

@@ -1,10 +1,9 @@
 import { reactive, ref, watch } from 'vue'
 import type { InvoiceItem } from '@/interfaces/InvoiceItem'
-import type { InvoiceListItem } from '@/interfaces/InvoicesListItem'
 import { User } from './AuthService'
 import { api } from '@/configs/Pocketbase'
 
-const InvoicesList = reactive<Record<InvoiceListItem['id'], InvoiceItem>>({})
+const InvoicesList = reactive<Record<InvoiceItem['id'], InvoiceItem>>({})
 const Invoices = ref<Array<InvoiceItem>>([])
 
 watch(
@@ -19,10 +18,10 @@ export function useInvoices() {
    */
   const subscribeToInvoicesTable = () => {
     api.Invoices.subscribe((payload) => {
-      const databaseInvoice: InvoiceListItem = payload.record as InvoiceListItem
+      const databaseInvoice: InvoiceItem = payload.record as InvoiceItem
 
       // CREATE A INVOICE ITEM
-      const invoice: InvoiceListItem = {
+      const invoice: InvoiceItem = {
         id: databaseInvoice?.id,
         customerName: databaseInvoice?.customerName,
         sellerName: databaseInvoice?.sellerName,
@@ -101,7 +100,7 @@ export function useInvoices() {
    * Function for deleting a invoices from the list of invoices
    * @param invoice
    */
-  const deleteInvoice = (invoice: InvoiceListItem) => {
+  const deleteInvoice = (invoice: InvoiceItem) => {
     console.warn(invoice, 'INVOICE')
     // DELETE THE PRODUCT FROM THE PRODUCTS LIST
     delete InvoicesList[invoice.id]

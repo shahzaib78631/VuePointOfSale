@@ -1,4 +1,4 @@
 export interface BrandItem {
-  id?: any
+  id: any
   name: string
 }
